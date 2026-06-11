@@ -1,3 +1,16 @@
+This is a fork of Azahar that adds a "3D Screenshot" feature, allowing users to capture 3D geometry currently being rendered on the screen, along with any textures.
+
+You can find the "Capture 3D Screenshot" option in the "Tools" menu:
+
+<p align="center"><img width="280" height="170" alt="image" src="https://github.com/user-attachments/assets/5699d82e-a79d-4508-9e5e-1bbd7ec9c373" /></p>
+
+
+Captures are saved in .gltf format, to a "3d" subfolder inside the "screenshots" folder where Azahar normally saves screenshots by default. For example, on Windows:
+
+`C:\Users\[YOUR USERNAME]\AppData\Roaming\Azahar\screenshots\3d`
+
+---
+
 ![Azahar Emulator](https://azahar-emu.org/resources/images/logo/azahar-name-and-logo.svg)
 
 ![Current Release](https://img.shields.io/github/v/release/azahar-emu/azahar?label=Current%20Release)
