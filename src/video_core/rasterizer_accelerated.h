@@ -5,6 +5,7 @@
 #pragma once
 
 #include "common/vector_math.h"
+#include "video_core/geometry_dumper.h"
 #include "video_core/rasterizer_interface.h"
 #include "video_core/shader/generator/pica_fs_config.h"
 #include "video_core/shader/generator/shader_uniforms.h"
@@ -66,6 +67,9 @@ protected:
     Pica::Shader::Generator::FSUniformData fs_data{};
     bool vs_data_dirty = true;
     bool fs_data_dirty = true;
+
+public:
+    GeometryDumper geometry_dumper;
 };
 
 } // namespace VideoCore

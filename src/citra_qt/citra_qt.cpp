@@ -114,6 +114,7 @@
 #include "network/network_settings.h"
 #include "ui_main.h"
 #include "video_core/gpu.h"
+#include "video_core/rasterizer_accelerated.h"
 #include "video_core/renderer_base.h"
 
 #ifdef __APPLE__
@@ -873,6 +874,7 @@ void GMainWindow::InitializeHotkeys() {
     link_action_shortcut(ui->action_Show_Status_Bar, QStringLiteral("Toggle Status Bar"));
     link_action_shortcut(ui->action_Fullscreen, fullscreen, true);
     link_action_shortcut(ui->action_Capture_Screenshot, QStringLiteral("Capture Screenshot"));
+    link_action_shortcut(ui->action_Capture_3D_Screenshot, QStringLiteral("Capture 3D Screenshot"));
     link_action_shortcut(ui->action_Debug_Pause, QStringLiteral("Debug Pause"));
     link_action_shortcut(ui->action_Debug_Resume, QStringLiteral("Debug Resume"));
     link_action_shortcut(ui->action_Debug_Step, QStringLiteral("Debug Step"), false, true);
@@ -1190,6 +1192,7 @@ void GMainWindow::ConnectMenuEvents() {
         }
     });
     connect_menu(ui->action_Capture_Screenshot, &GMainWindow::OnCaptureScreenshot);
+    connect_menu(ui->action_Capture_3D_Screenshot, &GMainWindow::OnCapture3DScreenshot);
     connect_menu(ui->action_Dump_Video, &GMainWindow::OnDumpVideo);
 
     // Tools debug
@@ -1249,6 +1252,7 @@ void GMainWindow::UpdateMenuState() {
     }
 
     ui->action_Capture_Screenshot->setEnabled(emulation_running);
+    ui->action_Capture_3D_Screenshot->setEnabled(emulation_running);
     ui->action_Advance_Frame->setEnabled(emulation_running && is_paused);
 
     if (emulation_running && is_paused) {
@@ -3197,6 +3201,47 @@ void GMainWindow::OnCaptureScreenshot() {
             QString::fromStdString(path));
         OnResumeGame(false);
     }
+}
+
+void GMainWindow::OnCapture3DScreenshot() {
+    if (!emu_thread) [[unlikely]] {
+        return;
+    }
+
+    std::string base_path = UISettings::values.screenshot_path.GetValue();
+    if (!FileUtil::IsDirectory(base_path)) {
+        if (!FileUtil::CreateFullPath(base_path)) {
+            base_path = FileUtil::GetUserPath(FileUtil::UserPath::UserDir);
+            base_path.append("screenshots/");
+            UISettings::values.screenshot_path = base_path;
+        }
+    }
+
+    // Keep only alphanumeric characters and replace everything else with underscores,
+    // then collapse runs of underscores and strip leading/trailing ones.
+    static QRegularExpression non_alnum(QStringLiteral("[^a-zA-Z0-9]+"));
+    QString sanitized = QString(game_title).replace(non_alnum, QStringLiteral("_"));
+    while (sanitized.startsWith(QLatin1Char('_'))) sanitized.remove(0, 1);
+    while (sanitized.endsWith(QLatin1Char('_'))) sanitized.chop(1);
+    if (sanitized.isEmpty()) sanitized = QStringLiteral("game");
+    const std::string clean_title = sanitized.toStdString();
+    const std::string timestamp = QDateTime::currentDateTime()
+                                      .toString(QStringLiteral("dd.MM.yy_hh.mm.ss.z"))
+                                      .toStdString();
+    const std::string output_dir =
+        fmt::format("{}/3d/{}_{}", base_path, clean_title, timestamp);
+
+    auto& renderer = system.GPU().Renderer();
+    auto* rasterizer =
+        dynamic_cast<VideoCore::RasterizerAccelerated*>(renderer.Rasterizer());
+    if (!rasterizer) {
+        QMessageBox::warning(this, tr("3D Screenshot"),
+                             tr("3D screenshot is not supported with the current renderer."));
+        return;
+    }
+    rasterizer->geometry_dumper.RequestCapture(output_dir);
+    LOG_INFO(Frontend, "3D screenshot requested, output: {}", output_dir);
+    message_label->setText(tr("3D screenshot capturing..."));
 }
 
 void GMainWindow::ShowFFmpegErrorMessage() {

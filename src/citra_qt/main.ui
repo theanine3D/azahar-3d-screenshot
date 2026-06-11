@@ -220,6 +220,7 @@
      <addaction name="menu_Debug"/>
     <addaction name="separator"/>
     <addaction name="action_Capture_Screenshot"/>
+    <addaction name="action_Capture_3D_Screenshot"/>
     <addaction name="action_Dump_Video"/>
     <addaction name="separator"/>
     <addaction name="action_Compress_ROM_File"/>
@@ -464,6 +465,14 @@
    </property>
    <property name="text">
     <string>Capture Screenshot</string>
+   </property>
+  </action>
+  <action name="action_Capture_3D_Screenshot">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Capture 3D Screenshot</string>
    </property>
   </action>
   <action name="action_Debug_Pause">

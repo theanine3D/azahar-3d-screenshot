@@ -87,6 +87,10 @@ void RasterizerAccelerated::AddTriangle(const Pica::OutputVertex& v0, const Pica
     vertex_batch.emplace_back(v0, false);
     vertex_batch.emplace_back(v1, AreQuaternionsOpposite(v0.quat, v1.quat));
     vertex_batch.emplace_back(v2, AreQuaternionsOpposite(v0.quat, v2.quat));
+
+    if (geometry_dumper.IsCapturing()) {
+        geometry_dumper.RecordTriangle(v0, v1, v2, regs.texturing);
+    }
 }
 
 RasterizerAccelerated::VertexArrayInfo RasterizerAccelerated::AnalyzeVertexArray(

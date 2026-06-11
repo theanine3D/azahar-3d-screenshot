@@ -1111,6 +1111,10 @@ void RendererVulkan::DrawCursor(const Layout::FramebufferLayout& layout) {
 
 void RendererVulkan::SwapBuffers() {
     system.perf_stats->StartSwap();
+
+    // Save geometry captured during the frame that just finished
+    rasterizer.geometry_dumper.EndFrame(system.Memory());
+
     const Layout::FramebufferLayout& layout = render_window.GetFramebufferLayout();
     PrepareRendertarget();
     RenderScreenshot();
@@ -1143,6 +1147,9 @@ void RendererVulkan::SwapBuffers() {
     system.perf_stats->EndSwap();
     rasterizer.TickFrame();
     EndFrame();
+
+    // Arm geometry capture for the next frame if one was requested
+    rasterizer.geometry_dumper.BeginFrame();
 }
 
 void RendererVulkan::RenderScreenshot() {

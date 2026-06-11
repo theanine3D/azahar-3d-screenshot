@@ -94,6 +94,9 @@ void RendererOpenGL::SwapBuffers() {
     OpenGLState prev_state = OpenGLState::GetCurState();
     state.Apply();
 
+    // Save geometry captured during the frame that just finished
+    rasterizer.geometry_dumper.EndFrame(system.Memory());
+
     render_window.SetupFramebuffer();
 
     PrepareRendertarget();
@@ -135,6 +138,9 @@ void RendererOpenGL::SwapBuffers() {
     EndFrame();
     prev_state.Apply();
     rasterizer.TickFrame();
+
+    // Arm geometry capture for the next frame if one was requested
+    rasterizer.geometry_dumper.BeginFrame();
 }
 
 void RendererOpenGL::RenderScreenshot() {

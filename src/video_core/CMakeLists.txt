@@ -15,6 +15,8 @@ add_library(video_core STATIC EXCLUDE_FROM_ALL
     gpu_impl.h
     pica_types.h
     precompiled_headers.h
+    geometry_dumper.cpp
+    geometry_dumper.h
     rasterizer_accelerated.cpp
     rasterizer_accelerated.h
     rasterizer_interface.h
@@ -215,7 +217,7 @@ target_include_directories(video_core PRIVATE ${HOST_SHADERS_INCLUDE})
 create_target_directory_groups(video_core)
 
 target_link_libraries(video_core PUBLIC citra_common citra_core)
-target_link_libraries(video_core PRIVATE Boost::serialization dds-ktx json-headers nihstro-headers tsl::robin_map)
+target_link_libraries(video_core PRIVATE Boost::serialization dds-ktx json-headers lodepng nihstro-headers tsl::robin_map)
 
 if ("x86_64" IN_LIST ARCHITECTURE)
     target_link_libraries(video_core PUBLIC xbyak)

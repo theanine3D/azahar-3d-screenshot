@@ -466,6 +466,10 @@ bool RasterizerOpenGL::SetupGeometryShader() {
 }
 
 bool RasterizerOpenGL::AccelerateDrawBatch(bool is_indexed) {
+    // Force software path during geometry capture so AddTriangle is called for every triangle
+    if (geometry_dumper.IsCapturing()) {
+        return false;
+    }
     if (regs.pipeline.use_gs != Pica::PipelineRegs::UseGS::No) {
         if (regs.pipeline.gs_config.mode != Pica::PipelineRegs::GSMode::Point) {
             return false;
@@ -537,6 +541,7 @@ void RasterizerOpenGL::DrawTriangles() {
     if (vertex_batch.empty())
         return;
     Draw(false, false);
+    geometry_dumper.FlushBatch();
 }
 
 bool RasterizerOpenGL::Draw(bool accelerate, bool is_indexed) {

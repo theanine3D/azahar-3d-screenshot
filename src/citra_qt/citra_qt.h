@@ -290,6 +290,7 @@ private slots:
     void OnCloseMovie();
     void OnSaveMovie();
     void OnCaptureScreenshot();
+    void OnCapture3DScreenshot();
     void OnDumpVideo();
     void OnCompressFile();
     void OnDecompressFile();
